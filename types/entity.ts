@@ -1,14 +1,14 @@
 import { BasicStatus, PermissionType } from './enum';
 
 export interface UserToken {
-  accessToken?: string;
-  refreshToken?: string;
+  token?: string;
+  expire?: string;
 }
 
 export interface UserInfo {
-  id: string;
+  userId: string;
   email: string;
-  username: string;
+  userName: string;
   password?: string;
   avatar?: string;
   role?: Role;
@@ -26,12 +26,12 @@ export interface Organization {
 }
 
 export interface Permission {
-  id: string;
+  menuId: string;
   parentId: string;
-  name: string;
+  menuName: string;
   label: string;
-  type: PermissionType;
-  route: string;
+  menuType: PermissionType;
+  path: string;
   status?: BasicStatus;
   order?: number;
   icon?: string;

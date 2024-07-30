@@ -52,7 +52,7 @@ export enum MultiTabOperation {
 }
 
 export enum PermissionType {
-  CATALOGUE,
-  MENU,
-  BUTTON,
+  CATALOGUE = 'M',
+  MENU = 'C',
+  BUTTON = 'F',
 }

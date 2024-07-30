@@ -18,16 +18,6 @@ import './locales/i18n';
 // tailwind css
 import './theme/index.css';
 
-const charAt = `
-    ███████╗██╗      █████╗ ███████╗██╗  ██╗ 
-    ██╔════╝██║     ██╔══██╗██╔════╝██║  ██║
-    ███████╗██║     ███████║███████╗███████║
-    ╚════██║██║     ██╔══██║╚════██║██╔══██║
-    ███████║███████╗██║  ██║███████║██║  ██║
-    ╚══════╝╚══════╝╚═╝  ╚═╝╚══════╝╚═╝  ╚═╝
-  `;
-console.info(`%c${charAt}`, 'color: #5BE49B');
-
 // 创建一个 client
 const queryClient = new QueryClient({
   defaultOptions: {

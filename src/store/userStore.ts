@@ -59,9 +59,16 @@ export const useSignIn = () => {
   const signIn = async (data: SignInReq) => {
     try {
       const res = await signInMutation.mutateAsync(data);
-      const { user, accessToken, refreshToken } = res;
-      setUserToken({ accessToken, refreshToken });
-      setUserInfo(user);
+      const { expire, token } = res;
+      setUserToken({ token, expire });
+
+      const userInfo = await userService.getUserInfo();
+      const menuRes = await userService.getMenu();
+
+      userInfo.permissions = menuRes;
+
+      // console.log(menuRes);
+      setUserInfo(userInfo);
       navigatge(HOMEPAGE, { replace: true });
     } catch (err) {
       message.warning({

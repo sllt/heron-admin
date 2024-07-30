@@ -11,6 +11,9 @@ import { useThemeToken } from '@/theme/hooks';
 
 import { LoginStateEnum, useLoginStateContext } from './providers/LoginStateProvider';
 
+import userService from '@/api/services/userService';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+
 function LoginForm() {
   const { t } = useTranslation();
   const themeToken = useThemeToken();
@@ -19,12 +22,24 @@ function LoginForm() {
   const { loginState, setLoginState } = useLoginStateContext();
   const signIn = useSignIn();
 
+  const queryClient = useQueryClient();
+
+  const { data } = useQuery({
+    queryKey: ['captcha'],
+    queryFn: userService.getCaptcha,
+  });
+
   if (loginState !== LoginStateEnum.LOGIN) return null;
 
-  const handleFinish = async ({ username, password }: SignInReq) => {
+  const refreshCaptcha = () => {
+    queryClient.invalidateQueries({ queryKey: ['captcha'] });
+  };
+
+  const handleFinish = async ({ username, password, code }: SignInReq) => {
     setLoading(true);
+    const uuid = data?.id || '';
     try {
-      await signIn({ username, password });
+      await signIn({ username, password, code, uuid });
     } finally {
       setLoading(false);
     }
@@ -84,6 +99,19 @@ function LoginForm() {
           rules={[{ required: true, message: t('sys.login.passwordPlaceholder') }]}
         >
           <Input.Password type="password" placeholder={t('sys.login.password')} />
+        </Form.Item>
+        <Form.Item name="code">
+          <Row>
+            <Col span={12}>
+              <Input placeholder="验证码" />
+            </Col>
+            <Col span={12} className="">
+              <img alt="" src={data?.b64s} onClick={refreshCaptcha} style={{ cursor: 'pointer' }} />
+            </Col>
+          </Row>
+        </Form.Item>
+        <Form.Item name="uuid" style={{ display: 'none' }}>
+          <Input />
         </Form.Item>
         <Form.Item>
           <Row>

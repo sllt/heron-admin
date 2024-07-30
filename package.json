@@ -69,6 +69,7 @@
     "@faker-js/faker": "^8.1.0",
     "@types/autosuggest-highlight": "^3.2.0",
     "@types/color": "^3.0.4",
+    "@types/node": "^22.0.0",
     "@types/nprogress": "^0.2.1",
     "@types/numeral": "^2.0.3",
     "@types/ramda": "^0.29.6",
