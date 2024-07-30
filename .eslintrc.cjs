@@ -1,6 +1,6 @@
 module.exports = {
   root: true, // 表示当前目录即为根目录，ESLint 规则将被限制到该目录下
-  env: { browser: true, es2020: true, node: true },
+  env: { browser: false, es2020: true, node: true },
   /* 解析器 */
   parser: '@typescript-eslint/parser', // 指定ESLint解析器
   parserOptions: {

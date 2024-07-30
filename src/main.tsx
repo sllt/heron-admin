@@ -7,7 +7,6 @@ import { Suspense } from 'react';
 import ReactDOM from 'react-dom/client';
 // react helmet
 import { HelmetProvider } from 'react-helmet-async';
-// eslint-disable-next-line import/no-unresolved
 import 'virtual:svg-icons-register';
 
 import App from '@/App';
