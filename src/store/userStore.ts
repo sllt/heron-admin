@@ -67,7 +67,6 @@ export const useSignIn = () => {
 
       userInfo.permissions = menuRes;
 
-      // console.log(menuRes);
       setUserInfo(userInfo);
       navigatge(HOMEPAGE, { replace: true });
     } catch (err) {

@@ -11,13 +11,13 @@ type Props = {
 };
 export default function AuthGuard({ children }: Props) {
   const router = useRouter();
-  const { accessToken } = useUserToken();
+  const { token } = useUserToken();
 
   const check = useCallback(() => {
-    if (!accessToken) {
+    if (!token) {
       router.replace('/login');
     }
-  }, [router, accessToken]);
+  }, [router, token]);
 
   useEffect(() => {
     check();

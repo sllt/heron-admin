@@ -60,8 +60,8 @@ function transformPermissionToMenuRoutes(
 ) {
   return permissions.map((permission) => {
     const {
-      route,
-      type,
+      path,
+      menuType,
       label,
       icon,
       order,
@@ -76,7 +76,7 @@ function transformPermissionToMenuRoutes(
     } = permission;
 
     const appRoute: AppRouteObject = {
-      path: route,
+      path: path,
       meta: {
         label,
         key: getCompleteRoute(permission, flattenedPermissions),
@@ -98,7 +98,7 @@ function transformPermissionToMenuRoutes(
       );
     }
 
-    if (type === PermissionType.CATALOGUE) {
+    if (menuType === PermissionType.CATALOGUE) {
       appRoute.meta!.hideTab = true;
       if (!parentId) {
         appRoute.element = (
@@ -112,10 +112,10 @@ function transformPermissionToMenuRoutes(
       if (!isEmpty(children)) {
         appRoute.children.unshift({
           index: true,
-          element: <Navigate to={children[0].route} replace />,
+          element: <Navigate to={children[0].path} replace />,
         });
       }
-    } else if (type === PermissionType.MENU) {
+    } else if (menuType === PermissionType.MENU) {
       const Element = lazy(resolveComponent(component!) as any);
       if (frameSrc) {
         appRoute.element = <Element src={frameSrc} />;
@@ -140,10 +140,10 @@ function transformPermissionToMenuRoutes(
  * @returns {string} - The complete route after splicing
  */
 function getCompleteRoute(permission: Permission, flattenedPermissions: Permission[], route = '') {
-  const currentRoute = route ? `/${permission.route}${route}` : `/${permission.route}`;
+  const currentRoute = route ? `/${permission.path}${route}` : `/${permission.path}`;
 
   if (permission.parentId) {
-    const parentPermission = flattenedPermissions.find((p) => p.id === permission.parentId)!;
+    const parentPermission = flattenedPermissions.find((p) => p.menuId === permission.parentId)!;
     return getCompleteRoute(parentPermission, flattenedPermissions, currentRoute);
   }
 
