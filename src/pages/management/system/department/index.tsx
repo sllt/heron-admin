@@ -107,7 +107,7 @@ export default function DepartmentPage() {
 
   const [queryParams, setQueryParams] = useState<SearchFormFieldType>({ deptName: '', status: 0 });
 
-  const { data } = useQuery({
+  const { data } = useQuery<Department[]>({
     queryKey: ['dept', queryParams],
     queryFn: () => deptService.getDeptList(queryParams),
   });

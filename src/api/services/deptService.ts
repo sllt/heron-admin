@@ -7,7 +7,7 @@ export enum OrgApi {
 }
 
 const getDeptList = (params: SearchFormFieldType) => {
-  apiClient.get<Department[]>({ url: OrgApi.Dept, params });
+  return apiClient.get<Department[]>({ url: OrgApi.Dept, params });
 };
 
 export default {
