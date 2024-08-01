@@ -55,18 +55,19 @@ export interface Role {
 
 export interface Department {
   deptId: number;
-  parrotId: number;
+  parentId?: number;
   deptPath: string;
-  deptName: string;
+  deptName?: string;
   sort: number;
   leader?: string;
   phone?: string;
   email: string;
-  status: number;
+  status?: number;
   dataScope: string;
   params?: string;
   createdAt: string;
   children?: Department[];
+  remark?: string;
 }
 
 export type SearchFormFieldType = Pick<Department, 'deptName' | 'status'>;
