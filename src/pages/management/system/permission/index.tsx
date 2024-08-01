@@ -14,16 +14,16 @@ import { Permission } from '#/entity';
 import { BasicStatus, PermissionType } from '#/enum';
 
 const defaultPermissionValue: Permission = {
-  id: '',
+  menuId: '',
   parentId: '',
-  name: '',
+  menuName: '',
   label: '',
-  route: '',
+  path: '',
   component: '',
   icon: '',
   hide: false,
   status: BasicStatus.ENABLE,
-  type: PermissionType.CATALOGUE,
+  menuType: PermissionType.CATALOGUE,
 };
 export default function PermissionPage() {
   const permissions = useUserPermission();
@@ -51,7 +51,7 @@ export default function PermissionPage() {
       title: 'Type',
       dataIndex: 'type',
       width: 60,
-      render: (_, record) => <ProTag color="processing">{PermissionType[record.type]}</ProTag>,
+      render: (_, record) => <ProTag color="processing">{PermissionType[record.menuType]}</ProTag>,
     },
     {
       title: 'Icon',
@@ -88,8 +88,8 @@ export default function PermissionPage() {
       width: 100,
       render: (_, record) => (
         <div className="flex w-full justify-end text-gray">
-          {record?.type === PermissionType.CATALOGUE && (
-            <IconButton onClick={() => onCreate(record.id)}>
+          {record?.menuType === PermissionType.CATALOGUE && (
+            <IconButton onClick={() => onCreate(record.menuId)}>
               <Iconify icon="gridicons:add-outline" size={18} />
             </IconButton>
           )}

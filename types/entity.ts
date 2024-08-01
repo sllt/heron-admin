@@ -52,3 +52,21 @@ export interface Role {
   desc?: string;
   permission?: Permission[];
 }
+
+export interface Department {
+  deptId: number;
+  parrotId: number;
+  deptPath: string;
+  deptName: string;
+  sort: number;
+  leader?: string;
+  phone?: string;
+  email: string;
+  status: number;
+  dataScope: string;
+  params?: string;
+  createdAt: string;
+  children?: Department[];
+}
+
+export type SearchFormFieldType = Pick<Department, 'deptName' | 'status'>;
