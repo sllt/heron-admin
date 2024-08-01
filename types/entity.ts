@@ -1,5 +1,16 @@
 import { BasicStatus, PermissionType } from './enum';
 
+export interface Pagination {
+  page: number;
+  size: number;
+  total: number;
+}
+
+export interface Response<T> {
+  data: T;
+  meta: Pagination;
+}
+
 export interface UserToken {
   token?: string;
   expire?: string;
@@ -71,3 +82,20 @@ export interface Department {
 }
 
 export type SearchFormFieldType = Pick<Department, 'deptName' | 'status'>;
+
+export interface Post {
+  postId: number;
+  postName?: string;
+  postCode?: string;
+  sort: number;
+  status?: number;
+  remark?: string;
+  createBy?: number;
+  updateBy?: number;
+  createdAt?: string;
+  updatedAt?: string;
+  dataScope?: string;
+  params?: string;
+}
+
+export type PostSearchFormFieldType = Pick<Post, 'postName' | 'status' | 'postCode'>;

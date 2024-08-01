@@ -12,53 +12,44 @@ import {
   Row,
   Select,
   Space,
-  TreeSelect,
 } from 'antd';
 import Table, { ColumnsType } from 'antd/es/table';
 import { TableRowSelection } from 'antd/es/table/interface';
 import { useEffect, useState } from 'react';
 
-import deptService from '@/api/services/deptService';
+import postService from '@/api/services/postService';
 import { IconButton, Iconify } from '@/components/icon';
 import ProTag from '@/theme/antd/components/tag';
 
-import DepartmentChart from './department-chart';
+import { Post, PostSearchFormFieldType, Response } from '#/entity';
 
-import { Department, SearchFormFieldType } from '#/entity';
-
-export default function DepartmentPage() {
+export default function PostPage() {
   const [searchForm] = Form.useForm();
   const queryClient = useQueryClient();
 
-  const [queryParams, setQueryParams] = useState<SearchFormFieldType>({
-    deptName: undefined,
+  const [queryParams, setQueryParams] = useState<PostSearchFormFieldType>({
+    postName: undefined,
     status: undefined,
+    postCode: undefined,
   });
-  const { data, refetch } = useQuery<Department[]>({
-    queryKey: ['dept', queryParams],
-    queryFn: () => deptService.getDeptList(queryParams),
+  const { data, refetch } = useQuery<Response<Post[]>>({
+    queryKey: ['post', queryParams],
+    queryFn: () => postService.getPostList(queryParams),
   });
 
-  const [departmentModalPros, setDepartmentModalProps] = useState<DepartmentModalProps>({
+  const [postModalPros, setPostModalProps] = useState<PostModalProps>({
     formValue: {
-      deptId: 0,
-      deptName: '',
-      status: 0,
-      parentId: undefined,
-      deptPath: '',
+      postId: 0,
       sort: 0,
-      email: '',
-      dataScope: '',
-      createdAt: '',
     },
     title: '新增',
     show: false,
     onOk: () => {
-      setDepartmentModalProps((prev) => ({ ...prev, show: false }));
+      setPostModalProps((prev) => ({ ...prev, show: false }));
       refetch();
     },
     onCancel: () => {
-      setDepartmentModalProps((prev) => ({ ...prev, show: false }));
+      setPostModalProps((prev) => ({ ...prev, show: false }));
     },
     edited: false,
   });
@@ -73,15 +64,16 @@ export default function DepartmentPage() {
     return '未知';
   };
 
-  const onDeleteDept = async (dept: Department) => {
-    const ids = [dept.deptId];
-    const result = await deptService.deleteDept(ids);
-    console.log(result);
-    await queryClient.invalidateQueries({ queryKey: ['dept'] });
+  const onDeleteDept = async (post: Post) => {
+    // console.log(post);
+    const ids = [post.postId];
+    await postService.deletePost(ids);
+    await queryClient.invalidateQueries({ queryKey: ['post'] });
   };
 
-  const columns: ColumnsType<Department> = [
-    { title: '部门名称', dataIndex: 'deptName', width: 300 },
+  const columns: ColumnsType<Post> = [
+    { title: '岗位编码', dataIndex: 'postCode' },
+    { title: '岗位名称', dataIndex: 'postName', width: 300 },
     { title: '排序', dataIndex: 'sort', align: 'center', width: 60 },
     {
       title: '状态',
@@ -120,7 +112,7 @@ export default function DepartmentPage() {
   ];
 
   // rowSelection objects indicates the need for row selection
-  const rowSelection: TableRowSelection<Department> = {
+  const rowSelection: TableRowSelection<Post> = {
     onChange: (selectedRowKeys, selectedRows) => {
       console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
     },
@@ -134,12 +126,12 @@ export default function DepartmentPage() {
 
   const onSearchFormReset = async () => {
     searchForm.resetFields();
-    setQueryParams({ deptName: undefined, status: undefined });
+    setQueryParams({ postName: undefined, status: undefined });
     await refetch();
   };
 
   const onCreate = () => {
-    setDepartmentModalProps((prev) => ({
+    setPostModalProps((prev) => ({
       ...prev,
       show: true,
       title: '新增',
@@ -152,8 +144,8 @@ export default function DepartmentPage() {
     }));
   };
 
-  const onEdit = (formValue: Department) => {
-    setDepartmentModalProps((prev) => ({
+  const onEdit = (formValue: Post) => {
+    setPostModalProps((prev) => ({
       ...prev,
       show: true,
       title: '编辑',
@@ -162,7 +154,7 @@ export default function DepartmentPage() {
     }));
   };
 
-  const onFinish = (values: SearchFormFieldType) => {
+  const onFinish = (values: PostSearchFormFieldType) => {
     setQueryParams(values);
   };
 
@@ -172,12 +164,25 @@ export default function DepartmentPage() {
         <Form form={searchForm} onFinish={onFinish}>
           <Row gutter={[16, 16]}>
             <Col span={24} lg={6}>
-              <Form.Item<SearchFormFieldType> label="部门名称" name="deptName" className="!mb-0">
+              <Form.Item<PostSearchFormFieldType>
+                label="岗位名称"
+                name="postName"
+                className="!mb-0"
+              >
                 <Input />
               </Form.Item>
             </Col>
             <Col span={24} lg={6}>
-              <Form.Item<SearchFormFieldType> label="状态" name="status" className="!mb-0">
+              <Form.Item<PostSearchFormFieldType>
+                label="岗位编码"
+                name="postCode"
+                className="!mb-0"
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col span={24} lg={6}>
+              <Form.Item<PostSearchFormFieldType> label="状态" name="status" className="!mb-0">
                 <Select>
                   <Select.Option value="2">
                     <ProTag color="success">正常</ProTag>
@@ -188,7 +193,7 @@ export default function DepartmentPage() {
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={24} lg={12}>
+            <Col span={24} lg={6}>
               <div className="flex justify-end">
                 <Button onClick={onSearchFormReset}>重置</Button>
                 <Button htmlType="submit" type="primary" className="ml-4">
@@ -214,22 +219,18 @@ export default function DepartmentPage() {
           scroll={{ x: 'max-content' }}
           pagination={false}
           columns={columns}
-          dataSource={data}
+          dataSource={data?.data}
           rowSelection={{ ...rowSelection }}
         />
       </Card>
 
-      <Card title="部门图示">
-        <DepartmentChart departments={data} />
-      </Card>
-
-      <OrganizationModal {...departmentModalPros} />
+      <PostModal {...postModalPros} />
     </Space>
   );
 }
 
-type DepartmentModalProps = {
-  formValue: Department;
+type PostModalProps = {
+  formValue: Post;
   title: string;
   show: boolean;
   onOk: VoidFunction;
@@ -237,46 +238,26 @@ type DepartmentModalProps = {
   edited: boolean;
 };
 
-function OrganizationModal({
-  title,
-  show,
-  formValue,
-  onOk,
-  onCancel,
-  edited,
-}: DepartmentModalProps) {
+function PostModal({ title, show, formValue, onOk, onCancel, edited }: PostModalProps) {
   const [form] = Form.useForm();
   useEffect(() => {
     form.setFieldsValue({ ...formValue });
   }, [formValue, form]);
 
-  const createDept = async () => {
+  const createPost = async () => {
     const values = await form.validateFields();
     if (edited) {
-      const dept = values as Department;
-      dept.deptId = formValue.deptId;
-      await deptService.updateDept(dept);
+      const post = values as Post;
+      post.postId = formValue.postId;
+      await postService.updatePost(post);
     } else {
-      await deptService.createDept(values as Department);
+      await postService.createPost(values as Post);
     }
     onOk();
   };
 
-  const { data } = useQuery({
-    queryKey: ['dept'],
-    queryFn: () => deptService.getDeptList({}),
-  });
-
-  const treeData = [
-    {
-      deptName: '主类目',
-      deptId: 0,
-      children: data,
-    },
-  ];
-
   return (
-    <Modal title={title} open={show} onOk={createDept} onCancel={onCancel}>
+    <Modal title={title} open={show} onOk={createPost} onCancel={onCancel}>
       <Form
         initialValues={formValue}
         form={form}
@@ -284,36 +265,28 @@ function OrganizationModal({
         wrapperCol={{ span: 18 }}
         layout="horizontal"
       >
-        <Form.Item<Department> label="部门名称" name="deptName" required>
+        <Form.Item<Post> label="岗位名称" name="postName" required>
           <Input />
         </Form.Item>
-        <Form.Item<Department> label="上级部门" name="parentId" required>
-          <TreeSelect
-            fieldNames={{
-              label: 'deptName',
-              value: 'deptId',
-              children: 'children',
-            }}
-            allowClear
-            treeData={treeData}
-          />
+        <Form.Item<Post> label="岗位编码" name="postCode" required>
+          <Input />
         </Form.Item>
-        <Form.Item<Department> label="排序" name="sort" required>
+        <Form.Item<Post> label="排序" name="sort" required>
           <InputNumber style={{ width: '100%' }} />
         </Form.Item>
-        <Form.Item<Department> label="状态" name="status" required>
+        <Form.Item<Post> label="状态" name="status" required>
           <Radio.Group optionType="button" buttonStyle="solid">
             <Radio value={2}> 正常 </Radio>
             <Radio value={1}> 停用 </Radio>
           </Radio.Group>
         </Form.Item>
-        <Form.Item<Department> label="负责人" name="leader" required>
-          <Input />
-        </Form.Item>
-        <Form.Item<Department> label="联系电话" name="phone" required>
-          <Input />
-        </Form.Item>
-        <Form.Item<Department> label="备注" name="remark">
+        {/* <Form.Item<Post> label="负责人" name="leader" required> */}
+        {/*   <Input /> */}
+        {/* </Form.Item> */}
+        {/* <Form.Item<Post> label="联系电话" name="phone" required> */}
+        {/*   <Input /> */}
+        {/* </Form.Item> */}
+        <Form.Item<Post> label="备注" name="remark">
           <Input.TextArea />
         </Form.Item>
       </Form>
