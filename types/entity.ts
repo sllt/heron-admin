@@ -109,3 +109,16 @@ export interface Post {
 }
 
 export type PostSearchFormFieldType = Pick<Post, 'postName' | 'status' | 'postCode'>;
+
+export interface Config {
+  id: number;
+  configName?: string;
+  configKey?: string;
+  configValue?: string;
+  configType?: string;
+  isFrontend?: string;
+  remark?: string;
+  createdAt?: string;
+}
+
+export type ConfigSearchFormFieldType = Pick<Config, 'configName' | 'configKey' | 'configType'>;
