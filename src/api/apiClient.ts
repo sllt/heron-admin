@@ -46,7 +46,8 @@ axiosInstance.interceptors.response.use(
   (error: AxiosError<Result>) => {
     const { response, message } = error || {};
 
-    const errMsg = response?.data?.msg || message || t('sys.api.errorMessage');
+    const errMsg =
+      response?.data?.details || response?.data?.msg || message || t('sys.api.errorMessage');
     Message.error(errMsg);
 
     const status = response?.status;

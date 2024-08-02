@@ -54,15 +54,25 @@ export interface Permission {
   children?: Permission[];
 }
 
+export type PermissionSearchFormFieldType = Pick<Permission, 'menuName' | 'label' | 'status'>;
+
 export interface Role {
-  id: string;
-  name: string;
-  label: string;
-  status: BasicStatus;
-  order?: number;
-  desc?: string;
+  roleId: number;
+  roleName?: string;
+  status?: string;
+  roleKey?: string;
+  roleSort?: number;
+  flag?: string;
+  remark?: string;
+  admin: boolean;
+  dataScope?: string;
+  params?: string;
   permission?: Permission[];
+  createdAt?: string;
+  updatedAt?: string;
 }
+
+export type RoleSearchFormFieldType = Pick<Role, 'roleName' | 'roleKey' | 'status'>;
 
 export interface Department {
   deptId: number;
