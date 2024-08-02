@@ -23,7 +23,7 @@ import menuService from '@/api/services/menuService';
 import { IconButton, Iconify } from '@/components/icon';
 import ProTag from '@/theme/antd/components/tag';
 
-import { Role, RoleSearchFormFieldType, Response, Permission } from '#/entity';
+import { Role, RoleSearchFormFieldType, Response } from '#/entity';
 import { flattenTrees } from '@/utils/tree';
 
 export default function RolePage() {
@@ -292,7 +292,7 @@ function RoleModal({ title, show, formValue, onOk, onCancel, edited }: RoleModal
         <Form.Item<Role> label="菜单列表" name="permission">
           <Tree
             checkable
-            // checkedKeys={checkedKeys}
+            checkedKeys={checkedKeys}
             treeData={menuList}
             fieldNames={{
               key: 'menuId',

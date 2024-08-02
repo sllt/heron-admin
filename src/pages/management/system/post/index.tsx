@@ -127,7 +127,7 @@ export default function PostPage() {
   const onSearchFormReset = async () => {
     searchForm.resetFields();
     setQueryParams({ postName: undefined, status: undefined });
-    await refetch();
+    queryClient.invalidateQueries({ queryKey: ['post'] });
   };
 
   const onCreate = () => {
@@ -214,7 +214,7 @@ export default function PostPage() {
         }
       >
         <Table
-          rowKey="deptId"
+          rowKey="postId"
           size="small"
           scroll={{ x: 'max-content' }}
           pagination={false}
@@ -280,12 +280,6 @@ function PostModal({ title, show, formValue, onOk, onCancel, edited }: PostModal
             <Radio value={1}> 停用 </Radio>
           </Radio.Group>
         </Form.Item>
-        {/* <Form.Item<Post> label="负责人" name="leader" required> */}
-        {/*   <Input /> */}
-        {/* </Form.Item> */}
-        {/* <Form.Item<Post> label="联系电话" name="phone" required> */}
-        {/*   <Input /> */}
-        {/* </Form.Item> */}
         <Form.Item<Post> label="备注" name="remark">
           <Input.TextArea />
         </Form.Item>
