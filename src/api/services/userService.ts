@@ -43,24 +43,24 @@ const logout = () => apiClient.get({ url: UserApi.Logout });
 const findById = (id: string) => apiClient.get<UserInfo[]>({ url: `${UserApi.User}/${id}` });
 
 const getUserList = (params: UserSearchFormFieldType) => {
-    return apiClient.get<Response<User[]>>({ url: UserApi.SysUser, params });
-  };
-  
-  const deleteUser = (ids: number[]) => {
-    return apiClient.delete({ url: UserApi.SysUser, data: { ids } });
-  };
-  
-  const createUser = (data: User) => {
-    return apiClient.post({ url: UserApi.SysUser, data });
-  };
-  
-  const updateUser = (data: User) => {
-    return apiClient.put({ url: `${UserApi.SysUser}/${data.postId}`, data });
-  };
-  
-  const getUser = (id: number) => {
-    return apiClient.get({ url: `${UserApi.SysUser}/${id}` });
-  };
+  return apiClient.get<Response<User[]>>({ url: UserApi.SysUser, params });
+};
+
+const deleteUser = (ids: number[]) => {
+  return apiClient.delete({ url: UserApi.SysUser, data: { ids } });
+};
+
+const createUser = (data: User) => {
+  return apiClient.post({ url: UserApi.SysUser, data });
+};
+
+const updateUser = (data: User) => {
+  return apiClient.put({ url: `${UserApi.SysUser}/${data.postId}`, data });
+};
+
+const getUser = (id: number) => {
+  return apiClient.get({ url: `${UserApi.SysUser}/${id}` });
+};
 
 export default {
   signin,

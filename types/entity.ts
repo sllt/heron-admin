@@ -176,9 +176,7 @@ export interface User {
   postId?: number;
   remark?: string;
   status?: string;
-  deptIds?: number[];
-  postIds?: number[];
-  roleIds?: number[];
+  dept?: Department;
 }
 
-export type UserSearchFormFieldType = Pick<User, 'username' | 'status' | 'phone'>;
+export type UserSearchFormFieldType = Pick<User, 'username' | 'status' | 'phone' | 'deptId'>;
