@@ -180,3 +180,16 @@ export interface User {
 }
 
 export type UserSearchFormFieldType = Pick<User, 'username' | 'status' | 'phone' | 'deptId'>;
+
+export interface Api {
+  id: number;
+  handle?: string;
+  title?: string;
+  path?: string;
+  action?: string;
+  type?: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export type ApiSearchFormFieldType = Pick<Api, 'title' | 'path' | 'action'> & Pagination;
