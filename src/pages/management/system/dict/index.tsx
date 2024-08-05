@@ -59,19 +59,19 @@ export default function DictTypePage() {
 
   const columns: ColumnsType<DictType> = [
     { title: '编号', dataIndex: 'id' },
-    { title: '名称', dataIndex: 'dictName', width: 130 },
+    { title: '名称', dataIndex: 'dictName', width: 110 },
     {
       title: '类型',
       dataIndex: 'dictType',
       align: 'center',
-      width: 120,
+      width: 110,
       render: (dictType, record) => <a href={`/dict/${record.id}`}>{dictType}</a>,
     },
     {
       title: '状态',
       dataIndex: 'status',
       align: 'center',
-      width: 120,
+      width: 90,
       render: (status) => (
         <ProTag color={status === 2 ? 'success' : 'error'}>{showStatus(status)}</ProTag>
       ),
