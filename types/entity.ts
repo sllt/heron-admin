@@ -162,3 +162,23 @@ export interface Dict {
 }
 
 export type DictSearchFormFieldType = Pick<Dict, 'dictLabel' | 'status' | 'dictType'>;
+
+export interface User {
+  userId: number;
+  username?: string;
+  nickName?: string;
+  phone?: string;
+  roleId?: number;
+  avatar?: string;
+  sex?: string;
+  email?: string;
+  deptId?: number;
+  postId?: number;
+  remark?: string;
+  status?: string;
+  deptIds?: number[];
+  postIds?: number[];
+  roleIds?: number[];
+}
+
+export type UserSearchFormFieldType = Pick<User, 'username' | 'status' | 'phone'>;
