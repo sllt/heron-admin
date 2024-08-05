@@ -1,14 +1,19 @@
 import { BasicStatus, PermissionType } from './enum';
 
-export interface Pagination {
+export interface Meta {
   page: number;
   size: number;
   total: number;
 }
 
+export interface Pagination {
+  page?: number;
+  size?: number;
+}
+
 export interface Response<T> {
   data: T;
-  meta: Pagination;
+  meta: Meta;
 }
 
 export interface UserToken {
@@ -122,3 +127,38 @@ export interface Config {
 }
 
 export type ConfigSearchFormFieldType = Pick<Config, 'configName' | 'configKey' | 'configType'>;
+
+export interface DictType {
+  id: number;
+  dictName?: string;
+  dictType?: string;
+  status?: number;
+  remark?: string;
+  createBy?: number;
+  updateBy?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export type DictTypeSearchFormFieldType = Pick<DictType, 'dictName' | 'dictType' | 'status'> &
+  Pagination;
+
+export interface Dict {
+  dictCode: number;
+  dictSort?: number;
+  dictLabel?: string;
+  dictValue?: string;
+  dictType?: string;
+  cssClass?: string;
+  listClass?: string;
+  isDefault?: string;
+  status?: number;
+  default?: string;
+  remark?: string;
+  createBy?: number;
+  updateBy?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export type DictSearchFormFieldType = Pick<Dict, 'dictLabel' | 'status' | 'dictType'>;
