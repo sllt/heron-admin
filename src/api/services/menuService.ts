@@ -1,6 +1,6 @@
 import apiClient from '../apiClient';
 
-import { Permission, PermissionSearchFormFieldType } from '#/entity';
+import { Permission } from '#/entity';
 
 export enum MenuApi {
   Menu = '/menu',
