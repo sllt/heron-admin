@@ -101,7 +101,8 @@
         "department": "部门",
         "post": "岗位",
         "dict": "字典",
-        "config": "参数"
+        "config": "参数",
+        "api": "接口"
       },
       "blog": "博客",
       "components": "组件",
