@@ -42,8 +42,9 @@ export interface Organization {
 }
 
 export interface Permission {
-  menuId: string;
-  parentId: string;
+  menuId: number;
+  parentId: number;
+  title?: string;
   menuName: string;
   label: string;
   menuType: PermissionType;

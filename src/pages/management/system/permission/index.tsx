@@ -12,12 +12,11 @@ import PermissionModal, { type PermissionModalProps } from './permission-modal';
 
 import { Permission } from '#/entity';
 import { BasicStatus, PermissionType } from '#/enum';
-import menuService from "@/api/services/menuService.ts";
-import deptService from "@/api/services/deptService.ts";
+import menuService from '@/api/services/menuService';
 
 const defaultPermissionValue: Permission = {
-  menuId: '',
-  parentId: '',
+  menuId: 0,
+  parentId: 0,
   menuName: '',
   label: '',
   path: '',
@@ -30,6 +29,7 @@ const defaultPermissionValue: Permission = {
 export default function PermissionPage() {
   const permissions = useUserPermission();
   const { t } = useTranslation();
+  const permissionUpdate = usePermissionUpdate();
 
   const [permissionModalProps, setPermissionModalProps] = useState<PermissionModalProps>({
     formValue: { ...defaultPermissionValue },
@@ -56,9 +56,10 @@ export default function PermissionPage() {
     }
   };
 
-  const onDeletePermission = (record: Permission) => {
+  const onDeletePermission = async (record: Permission) => {
     const ids = [record.menuId];
     await menuService.deleteMenu(ids);
+    await permissionUpdate();
   };
 
   const columns: ColumnsType<Permission> = [
@@ -133,13 +134,13 @@ export default function PermissionPage() {
     },
   ];
 
-  const onCreate = (parentId?: string) => {
+  const onCreate = (parentId?: number) => {
     setPermissionModalProps((prev) => ({
       ...prev,
       show: true,
       ...defaultPermissionValue,
       title: 'New',
-      formValue: { ...defaultPermissionValue, parentId: parentId ?? '' },
+      formValue: { ...defaultPermissionValue, parentId: parentId ?? 0 },
     }));
   };
 

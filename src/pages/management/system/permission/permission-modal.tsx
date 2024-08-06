@@ -27,12 +27,12 @@ export default function PermissionModal({
   const [compOptions, setCompOptions] = useState(pagesSelect);
 
   const getParentNameById = useCallback(
-    (parentId: string, data: Permission[] | undefined = permissions) => {
+    (parentId: number, data: Permission[] | undefined = permissions) => {
       let name = '';
       if (!data || !parentId) return name;
       for (let i = 0; i < data.length; i += 1) {
-        if (data[i].id === parentId) {
-          name = data[i].name;
+        if (data[i].menuId === parentId) {
+          name = data[i].title!;
         } else if (data[i].children) {
           name = getParentNameById(parentId, data[i].children);
         }
@@ -70,27 +70,22 @@ export default function PermissionModal({
         wrapperCol={{ span: 18 }}
         layout="horizontal"
       >
-        <Form.Item<Permission> label="Type" name="type" required>
+        <Form.Item<Permission> label="类型" name="menuType" required>
           <Radio.Group optionType="button" buttonStyle="solid">
-            <Radio value={PermissionType.CATALOGUE}>CATALOGUE</Radio>
-            <Radio value={PermissionType.MENU}>MENU</Radio>
+            <Radio value={PermissionType.CATALOGUE}>目录</Radio>
+            <Radio value={PermissionType.MENU}>菜单</Radio>
           </Radio.Group>
         </Form.Item>
 
-        <Form.Item<Permission> label="Name" name="name" required>
+        <Form.Item<Permission> label="名称" name="title" required>
           <Input />
         </Form.Item>
 
-        <Form.Item<Permission>
-          label="Label"
-          name="label"
-          required
-          tooltip="internationalization config"
-        >
+        <Form.Item<Permission> label="标签" name="menuName" required tooltip="设置i18n的key">
           <Input />
         </Form.Item>
 
-        <Form.Item<Permission> label="Parent" name="parentId" required>
+        <Form.Item<Permission> label="上级" name="parentId" required>
           <TreeSelect
             fieldNames={{
               label: 'name',
@@ -105,21 +100,23 @@ export default function PermissionModal({
           />
         </Form.Item>
 
-        <Form.Item<Permission> label="Route" name="route" required>
+        <Form.Item<Permission> label="路径" name="path" required>
           <Input />
         </Form.Item>
 
         <Form.Item
           noStyle
-          shouldUpdate={(prevValues, currentValues) => prevValues.type !== currentValues.type}
+          shouldUpdate={(prevValues, currentValues) =>
+            prevValues.menuType !== currentValues.menuType
+          }
         >
           {({ getFieldValue }) => {
-            if (getFieldValue('type') === PermissionType.MENU) {
+            if (getFieldValue('menuType') === PermissionType.MENU) {
               return (
                 <Form.Item<Permission>
-                  label="Component"
+                  label="组件"
                   name="component"
-                  required={getFieldValue('type') === PermissionType.MENU}
+                  required={getFieldValue('menuType') === PermissionType.MENU}
                 >
                   <AutoComplete
                     options={compOptions}
@@ -134,25 +131,25 @@ export default function PermissionModal({
           }}
         </Form.Item>
 
-        <Form.Item<Permission> label="Icon" name="icon" tooltip="local icon should start with ic">
+        <Form.Item<Permission> label="图标" name="icon" tooltip="图标应以ic开头">
           <Input />
         </Form.Item>
 
-        <Form.Item<Permission> label="Hide" name="hide" tooltip="hide in menu">
+        <Form.Item<Permission> label="隐藏" name="hide" tooltip="是否隐藏">
           <Radio.Group optionType="button" buttonStyle="solid">
-            <Radio value={false}>Show</Radio>
-            <Radio value>Hide</Radio>
+            <Radio value={false}>显示</Radio>
+            <Radio value>隐藏</Radio>
           </Radio.Group>
         </Form.Item>
 
-        <Form.Item<Permission> label="Order" name="order">
+        <Form.Item<Permission> label="排序" name="order">
           <InputNumber style={{ width: '100%' }} />
         </Form.Item>
 
-        <Form.Item<Permission> label="Status" name="status" required>
+        <Form.Item<Permission> label="状态" name="status" required>
           <Radio.Group optionType="button" buttonStyle="solid">
-            <Radio value={BasicStatus.ENABLE}> Enable </Radio>
-            <Radio value={BasicStatus.DISABLE}> Disable </Radio>
+            <Radio value={BasicStatus.ENABLE}> 正常 </Radio>
+            <Radio value={BasicStatus.DISABLE}> 停用 </Radio>
           </Radio.Group>
         </Form.Item>
       </Form>
