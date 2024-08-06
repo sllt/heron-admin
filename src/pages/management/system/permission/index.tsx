@@ -35,12 +35,14 @@ export default function PermissionPage() {
     formValue: { ...defaultPermissionValue },
     title: '新增',
     show: false,
-    onOk: () => {
+    onOk: async () => {
       setPermissionModalProps((prev) => ({ ...prev, show: false }));
+      await permissionUpdate();
     },
     onCancel: () => {
       setPermissionModalProps((prev) => ({ ...prev, show: false }));
     },
+    edited: false,
   });
 
   const menuTypeText = (type: string): string => {

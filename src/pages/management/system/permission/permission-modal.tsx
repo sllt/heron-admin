@@ -6,6 +6,7 @@ import { useUserPermission } from '@/store/userStore';
 
 import { Permission } from '#/entity';
 import { BasicStatus, PermissionType } from '#/enum';
+import menuService from '@/api/services/menuService';
 
 export type PermissionModalProps = {
   formValue: Permission;
@@ -13,6 +14,7 @@ export type PermissionModalProps = {
   show: boolean;
   onOk: VoidFunction;
   onCancel: VoidFunction;
+  edited: boolean;
 };
 
 export default function PermissionModal({
@@ -21,6 +23,7 @@ export default function PermissionModal({
   formValue,
   onOk,
   onCancel,
+  edited,
 }: PermissionModalProps) {
   const [form] = Form.useForm();
   const permissions = useUserPermission();
@@ -53,6 +56,18 @@ export default function PermissionModal({
     );
   };
 
+  const onCreatePermission = async () => {
+    const values = await form.validateFields();
+    if (edited) {
+      const menu = values as Permission;
+      menu.menuId = formValue.menuId;
+      await menuService.updateMenu(menu);
+    } else {
+      await menuService.createMenu(values as Permission);
+    }
+    onOk();
+  };
+
   useEffect(() => {
     form.setFieldsValue({ ...formValue });
     if (formValue.parentId) {
@@ -62,7 +77,7 @@ export default function PermissionModal({
   }, [formValue, form, getParentNameById]);
 
   return (
-    <Modal title={title} open={show} onOk={onOk} onCancel={onCancel}>
+    <Modal title={title} open={show} onOk={onCreatePermission} onCancel={onCancel}>
       <Form
         initialValues={formValue}
         form={form}
