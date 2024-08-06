@@ -5,13 +5,15 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { IconButton, Iconify, SvgIcon } from '@/components/icon';
-import { useUserPermission } from '@/store/userStore';
+import { useUserPermission, usePermissionUpdate } from '@/store/userStore';
 import ProTag from '@/theme/antd/components/tag';
 
 import PermissionModal, { type PermissionModalProps } from './permission-modal';
 
 import { Permission } from '#/entity';
 import { BasicStatus, PermissionType } from '#/enum';
+import menuService from "@/api/services/menuService.ts";
+import deptService from "@/api/services/deptService.ts";
 
 const defaultPermissionValue: Permission = {
   menuId: '',
@@ -31,7 +33,7 @@ export default function PermissionPage() {
 
   const [permissionModalProps, setPermissionModalProps] = useState<PermissionModalProps>({
     formValue: { ...defaultPermissionValue },
-    title: 'New',
+    title: '新增',
     show: false,
     onOk: () => {
       setPermissionModalProps((prev) => ({ ...prev, show: false }));
@@ -40,21 +42,40 @@ export default function PermissionPage() {
       setPermissionModalProps((prev) => ({ ...prev, show: false }));
     },
   });
+
+  const menuTypeText = (type: string): string => {
+    switch (type) {
+      case PermissionType.CATALOGUE:
+        return '目录';
+      case PermissionType.MENU:
+        return '菜单';
+      case PermissionType.BUTTON:
+        return '按钮';
+      default:
+        return '未知';
+    }
+  };
+
+  const onDeletePermission = (record: Permission) => {
+    const ids = [record.menuId];
+    await menuService.deleteMenu(ids);
+  };
+
   const columns: ColumnsType<Permission> = [
     {
-      title: 'Name',
+      title: '名称',
       dataIndex: 'name',
       width: 300,
       render: (_, record) => <div>{t(record.label)}</div>,
     },
     {
-      title: 'Type',
+      title: '类型',
       dataIndex: 'type',
       width: 60,
-      render: (_, record) => <ProTag color="processing">{PermissionType[record.menuType]}</ProTag>,
+      render: (_, record) => <ProTag color="processing">{menuTypeText(record.menuType)}</ProTag>,
     },
     {
-      title: 'Icon',
+      title: '图标',
       dataIndex: 'icon',
       width: 60,
       render: (icon: string) => {
@@ -66,11 +87,11 @@ export default function PermissionPage() {
       },
     },
     {
-      title: 'Component',
+      title: '组件',
       dataIndex: 'component',
     },
     {
-      title: 'Status',
+      title: '状态',
       dataIndex: 'status',
       align: 'center',
       width: 120,
@@ -80,9 +101,9 @@ export default function PermissionPage() {
         </ProTag>
       ),
     },
-    { title: 'Order', dataIndex: 'order', width: 60 },
+    { title: '排序', dataIndex: 'order', width: 60 },
     {
-      title: 'Action',
+      title: '操作',
       key: 'operation',
       align: 'center',
       width: 100,
@@ -96,7 +117,13 @@ export default function PermissionPage() {
           <IconButton onClick={() => onEdit(record)}>
             <Iconify icon="solar:pen-bold-duotone" size={18} />
           </IconButton>
-          <Popconfirm title="Delete the Permission" okText="Yes" cancelText="No" placement="left">
+          <Popconfirm
+            title="确定删除"
+            okText="是"
+            cancelText="否"
+            placement="left"
+            onConfirm={() => onDeletePermission(record)}
+          >
             <IconButton>
               <Iconify icon="mingcute:delete-2-fill" size={18} className="text-error" />
             </IconButton>
@@ -120,21 +147,21 @@ export default function PermissionPage() {
     setPermissionModalProps((prev) => ({
       ...prev,
       show: true,
-      title: 'Edit',
+      title: '编辑',
       formValue,
     }));
   };
   return (
     <Card
-      title="Permission List"
+      title="菜单列表"
       extra={
         <Button type="primary" onClick={() => onCreate()}>
-          New
+          新增
         </Button>
       }
     >
       <Table
-        rowKey="id"
+        rowKey="menuId"
         size="small"
         scroll={{ x: 'max-content' }}
         pagination={false}

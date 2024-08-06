@@ -1,13 +1,13 @@
-import { useMutation } from '@tanstack/react-query';
-import { App } from 'antd';
-import { useNavigate } from 'react-router-dom';
-import { create } from 'zustand';
+import { useMutation } from "@tanstack/react-query";
+import { App } from "antd";
+import { useNavigate } from "react-router-dom";
+import { create } from "zustand";
 
-import userService, { SignInReq } from '@/api/services/userService';
-import { getItem, removeItem, setItem } from '@/utils/storage';
+import userService, { SignInReq } from "@/api/services/userService";
+import { getItem, removeItem, setItem } from "@/utils/storage";
 
-import { UserInfo, UserToken } from '#/entity';
-import { StorageEnum } from '#/enum';
+import { UserInfo, UserToken } from "#/entity";
+import { StorageEnum } from "#/enum";
 
 const { VITE_APP_HOMEPAGE: HOMEPAGE } = import.meta.env;
 
@@ -78,6 +78,15 @@ export const useSignIn = () => {
   };
 
   return signIn;
+};
+
+export const usePermissionUpdate = () => {
+  const { setUserInfo } = useUserActions();
+  return async () => {
+    const userInfo = await userService.getUserInfo();
+    userInfo.permissions = await userService.getMenu();
+    setUserInfo(userInfo);
+  };
 };
 
 export default useUserStore;
