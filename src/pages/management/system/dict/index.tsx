@@ -51,7 +51,6 @@ export default function DictTypePage() {
   };
 
   const onDeleteDictType = async (post: DictType) => {
-    // console.log(post);
     const ids = [post.id];
     await dictService.deleteDictType(ids);
     await queryClient.invalidateQueries({ queryKey: ['post'] });
