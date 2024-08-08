@@ -53,8 +53,7 @@ export default function ConfigPage() {
     edited: false,
   });
 
-  const onDeleteDept = async (config: Config) => {
-    // console.log(config);
+  const onDeleteConfig = async (config: Config) => {
     const ids = [config.id];
     await configService.deleteConfig(ids);
     await queryClient.invalidateQueries({ queryKey: ['config'] });
@@ -88,7 +87,7 @@ export default function ConfigPage() {
             <Iconify icon="solar:pen-bold-duotone" size={18} />
           </IconButton>
           <Popconfirm
-            onConfirm={() => onDeleteDept(record)}
+            onConfirm={() => onDeleteConfig(record)}
             title="确定删除？"
             okText="是"
             cancelText="否"

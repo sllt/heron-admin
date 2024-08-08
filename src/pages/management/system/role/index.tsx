@@ -68,8 +68,7 @@ export default function RolePage() {
     return '未知';
   };
 
-  const onDeleteDept = async (role: Role) => {
-    // console.log(role);
+  const onDeleteRole = async (role: Role) => {
     const ids = [role.roleId];
     await roleService.deleteRole(ids);
     await queryClient.invalidateQueries({ queryKey: ['role'] });
@@ -100,7 +99,7 @@ export default function RolePage() {
             <Iconify icon="solar:pen-bold-duotone" size={18} />
           </IconButton>
           <Popconfirm
-            onConfirm={() => onDeleteDept(record)}
+            onConfirm={() => onDeleteRole(record)}
             title="确定删除？"
             okText="是"
             cancelText="否"

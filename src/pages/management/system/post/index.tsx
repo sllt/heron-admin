@@ -64,7 +64,7 @@ export default function PostPage() {
     return '未知';
   };
 
-  const onDeleteDept = async (post: Post) => {
+  const onDeletePost = async (post: Post) => {
     // console.log(post);
     const ids = [post.postId];
     await postService.deletePost(ids);
@@ -96,7 +96,7 @@ export default function PostPage() {
             <Iconify icon="solar:pen-bold-duotone" size={18} />
           </IconButton>
           <Popconfirm
-            onConfirm={() => onDeleteDept(record)}
+            onConfirm={() => onDeletePost(record)}
             title="确定删除？"
             okText="是"
             cancelText="否"

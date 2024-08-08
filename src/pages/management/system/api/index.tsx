@@ -55,8 +55,7 @@ export default function ApiPage() {
     edited: false,
   });
 
-  const onDeleteDept = async (api: Api) => {
-    // console.log(api);
+  const onDeleteApi = async (api: Api) => {
     const ids = [api.id];
     await apiService.deleteApi(ids);
     await queryClient.invalidateQueries({ queryKey: ['api'] });
@@ -113,7 +112,7 @@ export default function ApiPage() {
             <Iconify icon="solar:pen-bold-duotone" size={18} />
           </IconButton>
           <Popconfirm
-            onConfirm={() => onDeleteDept(record)}
+            onConfirm={() => onDeleteApi(record)}
             title="确定删除？"
             okText="是"
             cancelText="否"
