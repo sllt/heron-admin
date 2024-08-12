@@ -49,7 +49,7 @@ const updateDictType = (data: DictType) => {
   return apiClient.put({ url: `${DictApi.Dict}/${data.id}`, data });
 };
 
-const getDictType = (id: number) => {
+const getDictType = (id: number | string | undefined) => {
   return apiClient.get({ url: `${DictApi.DictType}/${id}` });
 };
 

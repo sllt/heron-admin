@@ -1,47 +1,97 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Button, Card, Col, Form, Input, Modal, Popconfirm, Radio, Row, Select, Space } from 'antd';
+import {
+  Button,
+  Card,
+  Col,
+  Form,
+  Input,
+  InputNumber,
+  Modal,
+  Popconfirm,
+  Radio,
+  Row,
+  Select,
+  Space,
+} from 'antd';
 import Table, { ColumnsType } from 'antd/es/table';
-import { TableRowSelection } from 'antd/es/table/interface';
-import { useEffect, useState } from 'react';
+// import { TableRowSelection } from 'antd/es/table/interface';
+import { useEffect, useMemo, useState } from 'react';
 
 import dictService from '@/api/services/dictService';
 import { IconButton, Iconify } from '@/components/icon';
 import ProTag from '@/theme/antd/components/tag';
 
-import { DictType, DictTypeSearchFormFieldType, Response } from '#/entity';
-import { usePathname, useRouter } from '@/router/hooks';
+import { Dict, DictSearchFormFieldType, DictType, Response } from '#/entity';
+import { useParams } from '@/router/hooks';
 
 export default function DictTypePage() {
   const [searchForm] = Form.useForm();
   const queryClient = useQueryClient();
-  const pathname = usePathname();
-  const { push } = useRouter();
+  const { id: currentDictId } = useParams();
 
-  const [queryParams, setQueryParams] = useState<DictTypeSearchFormFieldType>({
-    dictName: undefined,
+  const [queryParams, setQueryParams] = useState<DictSearchFormFieldType>({
     dictType: undefined,
+    dictLabel: undefined,
     status: undefined,
   });
-  const { data, refetch } = useQuery<Response<DictType[]>>({
-    queryKey: ['dictType', queryParams],
-    queryFn: () => dictService.getDictTypeList(queryParams),
+
+  const { data: dictTypeList } = useQuery<Response<DictType[]>>({
+    queryKey: ['dictType', null],
+    queryFn: () => dictService.getDictTypeList({ size: 1000 }),
   });
 
-  const [postModalPros, setDictTypeModalProps] = useState<DictTypeModalProps>({
+  const selectFormData = dictTypeList?.data.map((item) => {
+    return {
+      label: item.dictName,
+      value: item.dictType,
+    };
+  });
+
+  const { data: currentDictType } = useQuery<DictType>({
+    queryKey: ['currentDictType', currentDictId],
+    queryFn: () => dictService.getDictType(currentDictId),
+  });
+
+  const dictType = currentDictType?.dictType;
+  const { data: dictData, refetch: refetchDict } = useQuery<Response<Dict[]>>({
+    queryKey: ['dict', dictType, queryParams],
+    queryFn: () => {
+      let params = { ...queryParams };
+      if (dictType !== undefined && params.dictType === undefined) {
+        params = { ...params, dictType };
+      }
+      return dictService.getDictList(params);
+    },
+  });
+
+  const [postModalPros, setDictModalProps] = useState<DictModalProps>({
     formValue: {
-      id: 0,
+      dictCode: 0,
+      dictType: currentDictType?.dictType,
     },
     title: '新增',
     show: false,
     onOk: () => {
-      setDictTypeModalProps((prev) => ({ ...prev, show: false }));
-      refetch();
+      setDictModalProps((prev) => ({ ...prev, show: false }));
+      refetchDict();
     },
     onCancel: () => {
-      setDictTypeModalProps((prev) => ({ ...prev, show: false }));
+      setDictModalProps((prev) => ({ ...prev, show: false }));
     },
     edited: false,
   });
+
+  useEffect(() => {
+    if (currentDictType?.dictType !== undefined) {
+      setDictModalProps((prev) => ({
+        ...prev,
+        formValue: {
+          ...prev.formValue,
+          dictType: currentDictType.dictType,
+        },
+      }));
+    }
+  }, [currentDictType?.dictType]);
 
   const showStatus = (status: number): string => {
     if (status === 1) {
@@ -53,30 +103,17 @@ export default function DictTypePage() {
     return '未知';
   };
 
-  const onDeleteDictType = async (post: DictType) => {
-    const ids = [post.id];
-    await dictService.deleteDictType(ids);
-    await queryClient.invalidateQueries({ queryKey: ['post'] });
+  const onDeleteDict = async (dict: Dict) => {
+    const ids = [dict.dictCode];
+    await dictService.deleteDict(ids);
+    await queryClient.invalidateQueries({ queryKey: ['dict'] });
   };
 
-  const columns: ColumnsType<DictType> = [
-    { title: '编号', dataIndex: 'id' },
-    { title: '名称', dataIndex: 'dictName', width: 110 },
-    {
-      title: '类型',
-      dataIndex: 'dictType',
-      align: 'center',
-      width: 110,
-      render: (dictType, record) => (
-        <Button type="link"
-          onClick={() => {
-            push(`${pathname}/${record.id}`);
-          }}
-        >
-          {dictType}
-        </Button>
-      ),
-    },
+  const columns: ColumnsType<Dict> = [
+    { title: '编号', dataIndex: 'dictCode' },
+    { title: '标签', dataIndex: 'dictLabel', width: 110 },
+    { title: '键值', dataIndex: 'dictValue', width: 110 },
+    { title: '排序', dataIndex: 'dictSort' },
     {
       title: '状态',
       dataIndex: 'status',
@@ -99,7 +136,7 @@ export default function DictTypePage() {
             <Iconify icon="solar:pen-bold-duotone" size={18} />
           </IconButton>
           <Popconfirm
-            onConfirm={() => onDeleteDictType(record)}
+            onConfirm={() => onDeleteDict(record)}
             title="确定删除？"
             okText="是"
             cancelText="否"
@@ -115,26 +152,26 @@ export default function DictTypePage() {
   ];
 
   // rowSelection objects indicates the need for row selection
-  const rowSelection: TableRowSelection<DictType> = {
-    onChange: (selectedRowKeys, selectedRows) => {
-      console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
-    },
-    onSelect: (record, selected, selectedRows) => {
-      console.log(record, selected, selectedRows);
-    },
-    onSelectAll: (selected, selectedRows, changeRows) => {
-      console.log(selected, selectedRows, changeRows);
-    },
-  };
+  // const rowSelection: TableRowSelection<Dict> = {
+  //   onChange: (selectedRowKeys, selectedRows) => {
+  //     console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+  //   },
+  //   onSelect: (record, selected, selectedRows) => {
+  //     console.log(record, selected, selectedRows);
+  //   },
+  //   onSelectAll: (selected, selectedRows, changeRows) => {
+  //     console.log(selected, selectedRows, changeRows);
+  //   },
+  // };
 
   const onSearchFormReset = async () => {
     searchForm.resetFields();
-    setQueryParams({ dictName: undefined, dictType: undefined, status: undefined });
-    queryClient.invalidateQueries({ queryKey: ['dictType'] });
+    setQueryParams({ dictLabel: undefined, dictType: undefined, status: undefined });
+    await queryClient.invalidateQueries({ queryKey: ['dict'] });
   };
 
   const onCreate = () => {
-    setDictTypeModalProps((prev) => ({
+    setDictModalProps((prev) => ({
       ...prev,
       show: true,
       title: '新增',
@@ -147,8 +184,8 @@ export default function DictTypePage() {
     }));
   };
 
-  const onEdit = (formValue: DictType) => {
-    setDictTypeModalProps((prev) => ({
+  const onEdit = (formValue: Dict) => {
+    setDictModalProps((prev) => ({
       ...prev,
       show: true,
       title: '编辑',
@@ -157,35 +194,39 @@ export default function DictTypePage() {
     }));
   };
 
-  const onFinish = (values: DictTypeSearchFormFieldType) => {
+  const onFinish = (values: DictSearchFormFieldType) => {
     setQueryParams(values);
   };
-
   return (
     <Space direction="vertical" size="large" className="w-full">
       <Card>
         <Form form={searchForm} onFinish={onFinish}>
           <Row gutter={[16, 16]}>
             <Col span={24} lg={6}>
-              <Form.Item<DictTypeSearchFormFieldType>
+              <Form.Item<DictSearchFormFieldType>
                 label="字典名称"
-                name="dictName"
-                className="!mb-0"
-              >
-                <Input />
-              </Form.Item>
-            </Col>
-            <Col span={24} lg={6}>
-              <Form.Item<DictTypeSearchFormFieldType>
-                label="字典类型"
                 name="dictType"
                 className="!mb-0"
               >
+                <Select
+                  showSearch
+                  placeholder="请选择"
+                  optionFilterProp="label"
+                  options={selectFormData}
+                />
+              </Form.Item>
+            </Col>
+            <Col span={24} lg={6}>
+              <Form.Item<DictSearchFormFieldType>
+                label="字典标签"
+                name="dictLabel"
+                className="!mb-0"
+              >
                 <Input />
               </Form.Item>
             </Col>
             <Col span={24} lg={6}>
-              <Form.Item<DictTypeSearchFormFieldType> label="状态" name="status" className="!mb-0">
+              <Form.Item<DictSearchFormFieldType> label="状态" name="status" className="!mb-0">
                 <Select>
                   <Select.Option value={2}>
                     <ProTag color="success">正常</ProTag>
@@ -217,13 +258,13 @@ export default function DictTypePage() {
         }
       >
         <Table
-          rowKey="id"
+          rowKey="dictCode"
           size="small"
           scroll={{ x: 'max-content' }}
           pagination={false}
           columns={columns}
-          dataSource={data?.data}
-          rowSelection={{ ...rowSelection }}
+          dataSource={dictData?.data}
+          // rowSelection={{ ...rowSelection }}
         />
       </Card>
 
@@ -232,8 +273,8 @@ export default function DictTypePage() {
   );
 }
 
-type DictTypeModalProps = {
-  formValue: DictType;
+type DictModalProps = {
+  formValue: Dict;
   title: string;
   show: boolean;
   onOk: VoidFunction;
@@ -241,20 +282,23 @@ type DictTypeModalProps = {
   edited: boolean;
 };
 
-function DictTypeModal({ title, show, formValue, onOk, onCancel, edited }: DictTypeModalProps) {
+function DictTypeModal({ title, show, formValue, onOk, onCancel, edited }: DictModalProps) {
   const [form] = Form.useForm();
+  const initialValues = useMemo(() => ({ ...formValue }), [formValue]);
   useEffect(() => {
-    form.setFieldsValue({ ...formValue });
-  }, [formValue, form]);
+    if (show) {
+      form.setFieldsValue(initialValues);
+    }
+  }, [show, form, initialValues]);
 
   const createDictType = async () => {
     const values = await form.validateFields();
     if (edited) {
-      const dictType = values as DictType;
-      dictType.id = formValue.id;
-      await dictService.updateDictType(dictType);
+      const dict = values as Dict;
+      dict.dictCode = formValue.dictCode;
+      await dictService.updateDict(dict);
     } else {
-      await dictService.createDictType(values as DictType);
+      await dictService.createDict(values as Dict);
     }
     onOk();
   };
@@ -268,19 +312,25 @@ function DictTypeModal({ title, show, formValue, onOk, onCancel, edited }: DictT
         wrapperCol={{ span: 18 }}
         layout="horizontal"
       >
-        <Form.Item<DictType> label="岗位名称" name="dictName" required>
+        <Form.Item<Dict> label="字典类型" name="dictType" required>
+          <Input disabled />
+        </Form.Item>
+        <Form.Item<Dict> label="数据标签" name="dictLabel" required>
           <Input />
         </Form.Item>
-        <Form.Item<DictType> label="岗位编码" name="dictType" required>
+        <Form.Item<Dict> label="数据键值" name="dictValue" required>
           <Input />
         </Form.Item>
-        <Form.Item<DictType> label="状态" name="status" required>
+        <Form.Item<Dict> label="显示顺序" name="dictSort" required>
+          <InputNumber min={0} max={100} />
+        </Form.Item>
+        <Form.Item<Dict> label="状态" name="status" required>
           <Radio.Group optionType="button" buttonStyle="solid">
             <Radio value={2}> 正常 </Radio>
             <Radio value={1}> 停用 </Radio>
           </Radio.Group>
         </Form.Item>
-        <Form.Item<DictType> label="备注" name="remark">
+        <Form.Item<Dict> label="备注" name="remark">
           <Input.TextArea />
         </Form.Item>
       </Form>
