@@ -19,10 +19,10 @@ import { useEffect, useMemo, useState } from 'react';
 
 import dictService from '@/api/services/dictService';
 import { IconButton, Iconify } from '@/components/icon';
+import { useParams } from '@/router/hooks';
 import ProTag from '@/theme/antd/components/tag';
 
 import { Dict, DictSearchFormFieldType, DictType, Response } from '#/entity';
-import { useParams } from '@/router/hooks';
 
 export default function DictTypePage() {
   const [searchForm] = Form.useForm();
@@ -90,8 +90,9 @@ export default function DictTypePage() {
           dictType: currentDictType.dictType,
         },
       }));
+      searchForm.setFieldValue('dictType', currentDictType.dictName);
     }
-  }, [currentDictType?.dictType]);
+  }, [currentDictType, searchForm]);
 
   const showStatus = (status: number): string => {
     if (status === 1) {
@@ -207,6 +208,7 @@ export default function DictTypePage() {
                 label="字典名称"
                 name="dictType"
                 className="!mb-0"
+                // initialValue={currentDictlabel}
               >
                 <Select
                   showSearch
