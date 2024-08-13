@@ -1,18 +1,16 @@
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Alert, Button, Checkbox, Col, Divider, Form, Input, Row } from 'antd';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { AiFillGithub, AiFillGoogleCircle, AiFillWechat } from 'react-icons/ai';
 
 import { DEFAULT_USER, TEST_USER } from '@/_mock/assets';
-import { SignInReq } from '@/api/services/userService';
+import userService, { SignInReq } from '@/api/services/userService';
 import { useSignIn } from '@/store/userStore';
 import ProTag from '@/theme/antd/components/tag';
 import { useThemeToken } from '@/theme/hooks';
 
 import { LoginStateEnum, useLoginStateContext } from './providers/LoginStateProvider';
-
-import userService from '@/api/services/userService';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
 
 function LoginForm() {
   const { t } = useTranslation();
@@ -23,6 +21,7 @@ function LoginForm() {
   const signIn = useSignIn();
 
   const queryClient = useQueryClient();
+  const loginButtonRef = useRef<HTMLButtonElement>(null);
 
   const { data } = useQuery({
     queryKey: ['captcha'],
@@ -56,6 +55,12 @@ function LoginForm() {
           password: DEFAULT_USER.password,
         }}
         onFinish={handleFinish}
+        onKeyPress={(e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            loginButtonRef.current?.click();
+          }
+        }}
       >
         <div className="mb-4 flex flex-col">
           <Alert
@@ -101,12 +106,17 @@ function LoginForm() {
           <Input.Password type="password" placeholder={t('sys.login.password')} />
         </Form.Item>
         <Form.Item name="code">
-          <Row>
+          <Row gutter={8} align="middle">
             <Col span={12}>
               <Input placeholder="验证码" />
             </Col>
             <Col span={12} className="">
-              <img alt="" src={data?.b64s} onClick={refreshCaptcha} style={{ cursor: 'pointer' }} />
+              <img
+                alt=""
+                src={data?.b64s}
+                onClick={refreshCaptcha}
+                style={{ cursor: 'pointer', width: '100%', height: '40px', objectFit: 'cover' }}
+              />
             </Col>
           </Row>
         </Form.Item>
@@ -123,7 +133,10 @@ function LoginForm() {
             <Col span={12} className="text-right">
               <button
                 className="!underline"
-                onClick={() => setLoginState(LoginStateEnum.RESET_PASSWORD)}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setLoginState(LoginStateEnum.RESET_PASSWORD);
+                }}
               >
                 {t('sys.login.forgetPassword')}
               </button>
@@ -131,7 +144,13 @@ function LoginForm() {
           </Row>
         </Form.Item>
         <Form.Item>
-          <Button type="primary" htmlType="submit" className="w-full" loading={loading}>
+          <Button
+            type="primary"
+            htmlType="submit"
+            className="w-full"
+            loading={loading}
+            ref={loginButtonRef}
+          >
             {t('sys.login.loginButton')}
           </Button>
         </Form.Item>
